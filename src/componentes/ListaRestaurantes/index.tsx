@@ -9,37 +9,35 @@ const ListaRestaurantes = () => {
 
   const [restaurantes, setRestaurantes] = useState<IRestaurante[]>([])
   const [proximaPagina, setProximaPagina] = useState<string>('');
+  const [paginaAnterior, setPaginaAnterior] = useState<string>('');
 
-  useEffect(() => {
-    axios.get<IPaginacao<IRestaurante>>('http://localhost:8000/api/v1/restaurantes/')
+  const carregarDados = (url: string) => {
+    axios.get<IPaginacao<IRestaurante>>(url)
       .then(response => {
-        setRestaurantes(response.data.results)
-        setProximaPagina(response.data.next)
+        setRestaurantes(response.data.results);
+        setProximaPagina(response.data.next);
+        setPaginaAnterior(response.data.previous);
       })
       .catch(error => {
-        console.error("Erro ao recuperar restaurantes:", error);
+        console.error("Erro ao carregar restaurantes:", error);
       });
-  }, []);
-
-  const verMais = () => {
-    if (proximaPagina) {
-      axios.get<IPaginacao<IRestaurante>>(proximaPagina)
-        .then(response => {
-          setRestaurantes(prev => [...prev, ...response.data.results]);
-          setProximaPagina(response.data.next);
-        })
-        .catch(error => {
-          console.error("Erro ao carregar mais restaurantes:", error);
-        });
-    }
   }
+
+  useEffect(() => {
+    carregarDados('http://localhost:8000/api/v1/restaurantes/')
+  }, []);
 
   return (<section className={style.ListaRestaurantes}>
     <h1>Os restaurantes mais <em>bacanas</em>!</h1>
     {restaurantes?.map(item => <Restaurante restaurante={item} key={item.id} />)}
+    {paginaAnterior && (
+      <button onClick={() => carregarDados(paginaAnterior)}>
+        Página anterior
+      </button>
+    )}
     {proximaPagina && (
-      <button onClick={verMais}>
-        Ver mais
+      <button onClick={() => carregarDados(proximaPagina)}>
+        Próxima página
       </button>
     )}
   </section>)
