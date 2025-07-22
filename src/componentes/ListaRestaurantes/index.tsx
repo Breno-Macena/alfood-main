@@ -11,8 +11,12 @@ const ListaRestaurantes = () => {
   const [proximaPagina, setProximaPagina] = useState<string>('');
   const [paginaAnterior, setPaginaAnterior] = useState<string>('');
 
-  const carregarDados = (url: string) => {
-    axios.get<IPaginacao<IRestaurante>>(url)
+  const carregarDados = (url: string, termo?: string) => {
+    axios.get<IPaginacao<IRestaurante>>(url, {
+      params: {
+        search: termo ?? ''
+      }
+    })
       .then(response => {
         setRestaurantes(response.data.results);
         setProximaPagina(response.data.next);
@@ -27,20 +31,32 @@ const ListaRestaurantes = () => {
     carregarDados('http://localhost:8000/api/v1/restaurantes/')
   }, []);
 
-  return (<section className={style.ListaRestaurantes}>
-    <h1>Os restaurantes mais <em>bacanas</em>!</h1>
-    {restaurantes?.map(item => <Restaurante restaurante={item} key={item.id} />)}
-    {paginaAnterior && (
-      <button onClick={() => carregarDados(paginaAnterior)}>
-        Página anterior
-      </button>
-    )}
-    {proximaPagina && (
-      <button onClick={() => carregarDados(proximaPagina)}>
-        Próxima página
-      </button>
-    )}
-  </section>)
+  return (
+    <>
+      <section className={style.ListaRestaurantes}>
+        <h1>Os restaurantes mais <em>bacanas</em>!</h1>
+        <input
+          type="text"
+          placeholder="Pesquisar restaurante"
+          className={style.inputPesquisa}
+          onChange={(e) => {
+            carregarDados('http://localhost:8000/api/v1/restaurantes/', e.target.value.toLowerCase());
+          }}
+        />
+        {restaurantes?.map(item => <Restaurante restaurante={item} key={item.id} />)}
+        {paginaAnterior && (
+          <button onClick={() => carregarDados(paginaAnterior)}>
+            Página anterior
+          </button>
+        )}
+        {proximaPagina && (
+          <button onClick={() => carregarDados(proximaPagina)}>
+            Próxima página
+          </button>
+        )}
+      </section>
+    </>
+  )
 }
 
 export default ListaRestaurantes
