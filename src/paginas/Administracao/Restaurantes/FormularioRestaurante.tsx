@@ -42,21 +42,23 @@ const FormularioRestaurante = () => {
   }
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <Typography variant="h6" component="h1">Formulário de restaurantes</Typography>
-      <Box component="form" onSubmit={aoSubmeterFormulario}>
-        <TextField 
-          label="Nome" 
-          variant="standard" 
-          name="nome" value={nome} 
-          onChange={(e) => setNome(e.target.value)} 
-          fullWidth
-          required />
-        <Button type="submit" variant="outlined" fullWidth sx={{ marginTop: 1 }}>
-          Salvar
-        </Button>
+    <>
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexGrow: 1 }}>
+        <Typography variant="h6" component="h1">Formulário de restaurantes</Typography>
+        <Box component="form" sx={{ width: '100%' }} onSubmit={aoSubmeterFormulario}>
+          <TextField
+            label="Nome"
+            variant="standard"
+            name="nome" value={nome}
+            onChange={(e) => setNome(e.target.value)}
+            fullWidth
+            required />
+          <Button type="submit" variant="outlined" fullWidth sx={{ marginTop: 1 }}>
+            Salvar
+          </Button>
+        </Box>
       </Box>
-    </Box>
+    </>
   )
 }
 
