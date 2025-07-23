@@ -1,8 +1,8 @@
-import { Button, TextField } from '@mui/material'
-import axios from 'axios'
+import { Box, Button, TextField, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import IRestaurante from '../../../interfaces/IRestaurante'
+import apiAdmin from '../../../api'
 
 const FormularioRestaurante = () => {
   const [nome, setNome] = useState<string>('')
@@ -10,7 +10,7 @@ const FormularioRestaurante = () => {
 
   useEffect(() => {
     if (parametros.id) {
-      axios.get<IRestaurante>(`http://localhost:8000/api/v2/restaurantes/${parametros.id}/`)
+      apiAdmin.get<IRestaurante>(`restaurantes/${parametros.id}/`)
         .then(response => {
           setNome(response.data.nome)
         })
@@ -19,9 +19,9 @@ const FormularioRestaurante = () => {
 
   const aoSubmeterFormulario = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    
+
     if (parametros.id) {
-      axios.put(`http://localhost:8000/api/v2/restaurantes/${parametros.id}/`, { nome: nome })
+      apiAdmin.put(`restaurantes/${parametros.id}/`, { nome: nome })
         .then(() => {
           alert('Restaurante atualizado com sucesso!')
         })
@@ -31,7 +31,7 @@ const FormularioRestaurante = () => {
       return
     }
 
-    axios.post('http://localhost:8000/api/v2/restaurantes/', { nome: nome })
+    apiAdmin.post('restaurantes/', { nome: nome })
       .then(() => {
         alert('Restaurante salvo com sucesso!')
         setNome('')
@@ -42,12 +42,21 @@ const FormularioRestaurante = () => {
   }
 
   return (
-    <form onSubmit={aoSubmeterFormulario}>
-      <TextField label="Nome" variant="standard" name="nome" value={nome} onChange={(e) => setNome(e.target.value)} />
-      <Button type="submit" variant="outlined">
-        Salvar
-      </Button>
-    </form>
+    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <Typography variant="h6" component="h1">Formulário de restaurantes</Typography>
+      <Box component="form" onSubmit={aoSubmeterFormulario}>
+        <TextField 
+          label="Nome" 
+          variant="standard" 
+          name="nome" value={nome} 
+          onChange={(e) => setNome(e.target.value)} 
+          fullWidth
+          required />
+        <Button type="submit" variant="outlined" fullWidth sx={{ marginTop: 1 }}>
+          Salvar
+        </Button>
+      </Box>
+    </Box>
   )
 }
 

@@ -10,11 +10,14 @@ const ListaRestaurantes = () => {
   const [restaurantes, setRestaurantes] = useState<IRestaurante[]>([])
   const [proximaPagina, setProximaPagina] = useState<string>('');
   const [paginaAnterior, setPaginaAnterior] = useState<string>('');
+  const [termoPesquisa, setTermoPesquisa] = useState<string>('');
+  const [ordenacao, setOrdenacao] = useState<string>('nome');
 
-  const carregarDados = (url: string, termo?: string) => {
+  const carregarDados = (url: string) => {
     axios.get<IPaginacao<IRestaurante>>(url, {
       params: {
-        search: termo ?? ''
+        search: termoPesquisa,
+        ordering: ordenacao
       }
     })
       .then(response => {
@@ -35,14 +38,30 @@ const ListaRestaurantes = () => {
     <>
       <section className={style.ListaRestaurantes}>
         <h1>Os restaurantes mais <em>bacanas</em>!</h1>
-        <input
-          type="text"
-          placeholder="Pesquisar restaurante"
-          className={style.inputPesquisa}
-          onChange={(e) => {
-            carregarDados('http://localhost:8000/api/v1/restaurantes/', e.target.value.toLowerCase());
-          }}
-        />
+        <form className={style.formulario} onSubmit={e => {
+          e.preventDefault();
+          carregarDados('http://localhost:8000/api/v1/restaurantes/');
+        }}>
+          <input
+            type="text"
+            placeholder="Pesquisar restaurante"
+            className={style.inputPesquisa}
+            onChange={e => setTermoPesquisa(e.target.value.toLowerCase())}
+          />
+          <select
+            className={style.selectOrdenacao}
+            onChange={e => setOrdenacao(e.target.value)}
+          >
+            <option value="nome">Nome</option>
+            <option value="id">Id</option>
+          </select>
+          <button
+            type="submit"
+            className={style.botaoBuscar}
+          >
+            Buscar
+          </button>
+        </form>
         {restaurantes?.map(item => <Restaurante restaurante={item} key={item.id} />)}
         {paginaAnterior && (
           <button onClick={() => carregarDados(paginaAnterior)}>
