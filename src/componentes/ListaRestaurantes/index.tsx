@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import IRestaurante from '../../interfaces/IRestaurante';
 import style from './ListaRestaurantes.module.scss';
 import Restaurante from './Restaurante';
@@ -13,7 +13,7 @@ const ListaRestaurantes = () => {
   const [termoPesquisa, setTermoPesquisa] = useState<string>('');
   const [ordenacao, setOrdenacao] = useState<string>('nome');
 
-  const carregarDados = (url: string) => {
+  const carregarDados = useCallback((url: string) => {
     axios.get<IPaginacao<IRestaurante>>(url, {
       params: {
         search: termoPesquisa,
@@ -28,40 +28,29 @@ const ListaRestaurantes = () => {
       .catch(error => {
         console.error("Erro ao carregar restaurantes:", error);
       });
-  }
+  }, [termoPesquisa, ordenacao]);
 
   useEffect(() => {
     carregarDados('http://localhost:8000/api/v1/restaurantes/')
-  }, []);
+  }, [carregarDados]);
 
   return (
     <>
       <section className={style.ListaRestaurantes}>
         <h1>Os restaurantes mais <em>bacanas</em>!</h1>
-        <form className={style.formulario} onSubmit={e => {
-          e.preventDefault();
-          carregarDados('http://localhost:8000/api/v1/restaurantes/');
-        }}>
-          <input
-            type="text"
-            placeholder="Pesquisar restaurante"
-            className={style.inputPesquisa}
-            onChange={e => setTermoPesquisa(e.target.value.toLowerCase())}
-          />
-          <select
-            className={style.selectOrdenacao}
-            onChange={e => setOrdenacao(e.target.value)}
-          >
-            <option value="nome">Nome</option>
-            <option value="id">Id</option>
-          </select>
-          <button
-            type="submit"
-            className={style.botaoBuscar}
-          >
-            Buscar
-          </button>
-        </form>
+        <input
+          type="text"
+          placeholder="Pesquisar restaurante"
+          className={style.inputPesquisa}
+          onChange={e => setTermoPesquisa(e.target.value.toLowerCase())}
+        />
+        <select
+          className={style.selectOrdenacao}
+          onChange={e => setOrdenacao(e.target.value)}
+        >
+          <option value="nome">Nome</option>
+          <option value="id">Id</option>
+        </select>
         {restaurantes?.map(item => <Restaurante restaurante={item} key={item.id} />)}
         {paginaAnterior && (
           <button onClick={() => carregarDados(paginaAnterior)}>

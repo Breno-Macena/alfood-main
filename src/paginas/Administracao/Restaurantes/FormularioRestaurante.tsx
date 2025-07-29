@@ -44,7 +44,13 @@ const FormularioRestaurante = () => {
   return (
     <>
       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexGrow: 1 }}>
-        <Typography variant="h6" component="h1">Formulário de restaurantes</Typography>
+        <Typography variant="h6" component="h1">
+          {
+            parametros.id ?
+              <span>Editar restaurante</span> :
+              <span>Novo restaurante</span>
+          }
+        </Typography>
         <Box component="form" sx={{ width: '100%' }} onSubmit={aoSubmeterFormulario}>
           <TextField
             label="Nome"
